@@ -1,56 +1,57 @@
-# 🚀 AI-Driven Serverless Image Processing Pipeline
-
-**Engineer:** Shahd Galal Anwar
+# Case Study: Serverless Image Optimization Pipeline
+**Engineer:** Shahd Galal Anwar  
 **Region:** `eu-central-1` (Frankfurt)  
 
 ---
 
-## 🏗️ 1. System Architecture
-This solution implements a **fully decoupled, event-driven pattern** to automate image ingestion and optimization. By leveraging AWS serverless primitives, the pipeline eliminates infrastructure management while ensuring high availability and cost-efficiency.
-![System-Architecture](System_Architecture.png)
+## 1. Executive Summary
+This project demonstrates a **highly scalable, event-driven architecture** designed to automate image ingestion and optimization. By leveraging AWS serverless primitives, the system achieves a "zero-maintenance" footprint while ensuring cost-efficiency and high availability for global web applications.
+
+---
+
+## 2. Solution Architecture
+The pipeline follows a decoupled, asynchronous pattern to minimize client-side latency and maximize backend throughput.
+[System_Architecture](./System_Architecture.png) 
+
+
 
 ### **The Workflow Lifecycle**
-1. **Secure Handshake:** The Client (Browser) requests a secure upload handshake via **Amazon API Gateway**.
-2. **Delegated Authorization:** A specialized **Lambda function** (`GetPresignedUrl`) issues an **S3 Presigned URL**, enabling secure, credential-free uploads directly to the cloud.
-3. **Direct Ingestion:** The Client transmits the raw image to the **Source S3 Bucket**, bypassing server-side bottlenecks.
-4. **Event Trigger:** S3 Event Notifications automatically invoke the **ImageProcessor Lambda** upon successful object creation.
-5. **Optimization & Persistence:**
-    * The processor dynamically initializes the **Pillow** library within the ephemeral `/tmp` directory.
-    * Images are resized and optimized on-the-fly.
-    * Final metadata (S3 paths and timestamps) is indexed in **Amazon DynamoDB**.
-    * The processed asset is committed to the **Destination S3 Bucket**.
+1. **Secure Handshake:** The client requests an upload handshake via **Amazon API Gateway**. 
+2. **Delegated Authorization:** A **Lambda function** (`GetPresignedUrl`) issues an **S3 Presigned URL**, enabling secure, temporary write-access directly to the cloud without exposing long-term AWS credentials.
+3. **Direct Ingestion:** The browser transmits the raw image directly to the **Source S3 Bucket**, reducing server-side compute overhead.
+4. **Asynchronous Trigger:** S3 Event Notifications invoke the **ImageProcessor Lambda** immediately upon object finalization.
+5. **Transformation & Persistence:** * **Dynamic Bootstrapping:** The processor initializes the `Pillow` library within the ephemeral `/tmp` directory to maintain a lightweight deployment package.
+    * **Image Optimization:** Assets are resized and optimized for web delivery.
+    * **Metadata Indexing:** Final asset URIs and timestamps are committed to **Amazon DynamoDB**, while the optimized file is stored in the **Destination S3 Bucket**.
 
 ---
 
-## 🛠️ 2. Technical Specification
+## 3. Technical Specification
 
-| Layer | Technology | Role |
+| Layer | Service | Justification |
 | :--- | :--- | :--- |
-| **Frontend** | HTML5, CSS3, Vanilla JS | Responsive UI & Direct S3 Integration |
-| **API Management** | Amazon API Gateway | RESTful Endpoint Orchestration |
-| **Compute** | AWS Lambda (Python 3.12) | On-demand Image Manipulation |
-| **Storage** | Amazon S3 | Scalable Object Storage (Source & Dest) |
-| **Database** | Amazon DynamoDB | Low-latency NoSQL Metadata Store |
+| **Compute** | AWS Lambda | Event-driven execution; zero costs during idle periods. |
+| **Storage** | Amazon S3 | Durable, scalable object storage with built-in lifecycle triggers. |
+| **Database** | Amazon DynamoDB | Low-latency NoSQL storage for rapid metadata retrieval. |
+| **API Layer** | Amazon API Gateway | Managed RESTful entry point with integrated CORS handling. |
+| **Security** | IAM & STS | Least-privileged access via execution roles and presigned URLs. |
 
 ---
 
-## ⚙️ 3. Engineering Highlights
-To maintain high performance and security in the **Frankfurt** region, the following technical guardrails were implemented:
+## 4. Architectural Decisions & Optimization
 
-* **Dynamic Dependency Injection:** To keep the deployment package lightweight, the **Pillow** library is installed at runtime within the `/tmp` directory. This "Bootstrap" method ensures the function remains lean and reduces cold-start latency.
-* **Security Hardening:** Boto3 clients are strictly enforced to use **S3 Signature Version 4**, ensuring compatibility with Frankfurt’s enhanced security requirements.
-* **Performance Tuning:** A **60-second timeout** is configured to account for the dynamic library bootstrap and processing of high-resolution assets.
-* **Least Privilege Access:** The `ImageProcessorRole-Frankfurt` is scoped specifically to S3, DynamoDB, and CloudWatch Logs to minimize the security blast radius.
+### **Security & Regional Compliance**
+To comply with the strict security protocols of the **Frankfurt (eu-central-1)** region, the Boto3 SDK was explicitly configured to use **S3 Signature Version 4**. This ensures all requests are signed with high-entropy cryptographic hashes, mitigating the risk of unauthorized access.
 
----
-
-## 💡 4. Challenges Overcome
-* **CORS & Signature Mismatch:** Resolved `403 Forbidden` errors by synchronizing the S3 CORS policy with the frontend Fetch API and standardizing signature versions.
-* **Library Management:** Overcame Lambda deployment limits by implementing a custom runtime installation script for image processing dependencies.
-* **Regional Latency:** Synchronized all resources within `eu-central-1` to minimize cross-region data transfer costs and maximize throughput.
+### **Performance Engineering**
+* **Cold Start Mitigation:** By installing image processing dependencies at runtime within the `/tmp` storage, the Lambda deployment package remains under 5MB. This significantly reduces cold-start latency compared to traditional heavy deployment packages.
+* **Elastic Scalability:** The architecture is natively elastic; it scales automatically from zero to thousands of concurrent requests without manual intervention or server provisioning.
 
 ---
 
-## 📽️ 5. Visual Documentation
-* **Architecture Diagram:** `[architecture-diagram.png]`
-* **Live Demonstration:** `[Link to Video/GIF]`
+## 5. Deployment & Visuals
+* **CORS Management:** Implemented granular bucket policies to allow secure cross-origin requests from the web frontend.
+* **Observability:** Integrated with **Amazon CloudWatch** for real-time monitoring, error tracking, and performance logging.
+
+---
+* [Live Demonstration Video](#)
