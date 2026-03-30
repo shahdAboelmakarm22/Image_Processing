@@ -11,7 +11,7 @@ This project demonstrates a **highly scalable, event-driven architecture** desig
 
 ## 2. Solution Architecture
 The pipeline follows a decoupled, asynchronous pattern to minimize client-side latency and maximize backend throughput.
-[System_Architecture](./System_Architecture.png) 
+![System_Architecture](./System_Architecture.png) 
 
 
 
