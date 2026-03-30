@@ -1,4 +1,4 @@
-# Case Study: Serverless Image Optimization Pipeline
+# Image Processing Application
 **Engineer:** Shahd Galal Anwar  
 **Region:** `eu-central-1` (Frankfurt)  
 
